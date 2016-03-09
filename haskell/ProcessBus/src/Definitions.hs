@@ -1,47 +1,61 @@
 module Definitions where
 
 import Data.Graph.Inductive
-import qualified Data.Graph.Inductive.PatriciaTree as G
 import Data.List
+import Data.Function (on)
+import Cyclicity
+import qualified Data.Graph.Inductive.PatriciaTree as G
 
-data MessageTransport = Bus String | Queue String deriving (Show, Eq)
+maybeToEither = flip maybe Right . Left
 
-path :: MessageTransport -> String
-path (Bus p) = p
-path (Queue p) = p
+data ConfigError = DuplicateNodes | CyclicForwards | TransportDoesNotExist deriving Show
 
-data Forward = Forward {
-	from :: MessageTransport,
-	to :: MessageTransport
-}
+data TransportType = Bus | Queue deriving (Show, Eq)
 
-checkDuplicates :: Ord a => [a] -> Bool
-checkDuplicates = (any $ (> 1) . length) . groupBy (==) . sort
+data Transport = Transport {
+  transportType :: TransportType,
+  path :: String,
+  forwards :: [Transport]
+} deriving (Show)
 
--- | Checks if a node is a leaf node in a graph
-isLeaf :: Graph g => g a b -> Node -> (Bool, Node)
-isLeaf g node = (null $ suc g node, node)
+type TransportConfig = [Transport]
 
--- | Checks if graph has any leaf nodes
-hasLeaf :: Graph gr => gr a b -> Bool
-hasLeaf gr = any fst . map (isLeaf gr) . nodes $ gr
+instance Ord Transport where
+  Transport _ p1 _ `compare` Transport _ p2 _ = compare p1 p2
 
--- | Delete an arbitrary leaf node from a graph
-delLeaf :: DynGraph gr => gr a b -> Maybe (gr a b)
-delLeaf gr = (flip delNode) gr <$> leaf
-	where leaf = find isLeaf' $ nodes gr
-	      isLeaf' = fst . isLeaf gr
+instance Eq Transport where 
+  Transport _ p1 _ == Transport _ p2 _ = p1 == p2
 
--- | Checks if a graph is cyclic	      
--- Stricly speaking, we should never be able to return [Nothing];
--- the guards ensure that only graphs with leaf nodes reach the delete leaf case.
-isCyclicSafe :: DynGraph gr => gr a b -> Maybe Bool
-isCyclicSafe gr 
-	| isEmpty gr = Just False
-	| not $ hasLeaf gr = Just True
-	| otherwise = delLeaf gr >>= isCyclicSafe
+set :: Ord a => [a] -> Maybe [a]
+set xs = if hasDupes then Nothing else Just xs
+  where hasDupes = (any $ (> 1) . length) . groupBy (==) . sort $ xs
 
-isCyclic :: DynGraph gr => gr a b -> Bool
-isCyclic g = case isCyclicSafe g of
-	Just x -> x
-	Nothing -> error "Attempted to remove a leaf node where none existed."
+transportSet :: TransportConfig -> Either ConfigError TransportConfig
+transportSet = maybeToEither DuplicateNodes . set
+
+configNodes :: TransportConfig -> Either ConfigError [LNode Transport]
+configNodes ts = zip ([1..] :: [Int]) <$> transportSet ts
+
+forwardName :: Transport -> Transport -> String
+forwardName a b = path a ++ ":" ++ path b
+
+buildEdges :: [LNode Transport] -> Maybe [LEdge String]
+buildEdges nodes = sequence $ do
+  lNode <- nodes
+  forward <- forwards . snd $ lNode
+  let mayFw = find ((== forward) . snd) nodes
+  return $ do
+    fwlNode <- mayFw
+    return $ (fst lNode, fst fwlNode, forwardName' lNode fwlNode)
+  where forwardName' = forwardName `on` snd
+
+configEdges :: [LNode Transport] -> Either ConfigError [LEdge String]
+configEdges = maybeToEither TransportDoesNotExist . buildEdges
+
+configGraph :: DynGraph g => TransportConfig -> Either ConfigError (g Transport String)
+configGraph ts = do
+  transports <- transportSet ts
+  nodes <- configNodes transports
+  edges <- configEdges nodes
+  let graph = mkGraph nodes edges
+  maybeToEither CyclicForwards $ acyclic graph
