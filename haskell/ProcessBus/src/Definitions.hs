@@ -6,7 +6,7 @@ import Data.Function (on)
 import Cyclicity
 import qualified Data.Graph.Inductive.PatriciaTree as G
 
-maybeToEither = flip maybe Right . Left
+useError = flip maybe Right . Left
 
 data ConfigError = DuplicateNodes | CyclicForwards | TransportDoesNotExist deriving Show
 
@@ -30,11 +30,8 @@ set :: Ord a => [a] -> Maybe [a]
 set xs = if hasDupes then Nothing else Just xs
   where hasDupes = (any $ (> 1) . length) . groupBy (==) . sort $ xs
 
-transportSet :: TransportConfig -> Either ConfigError TransportConfig
-transportSet = maybeToEither DuplicateNodes . set
-
-configNodes :: TransportConfig -> Either ConfigError [LNode Transport]
-configNodes ts = zip ([1..] :: [Int]) <$> transportSet ts
+configNodes :: TransportConfig -> [LNode Transport]
+configNodes = zip ([1..] :: [Int])
 
 forwardName :: Transport -> Transport -> String
 forwardName a b = path a ++ ":" ++ path b
@@ -49,13 +46,10 @@ buildEdges nodes = sequence $ do
     return $ (fst lNode, fst fwlNode, forwardName' lNode fwlNode)
   where forwardName' = forwardName `on` snd
 
-configEdges :: [LNode Transport] -> Either ConfigError [LEdge String]
-configEdges = maybeToEither TransportDoesNotExist . buildEdges
-
 configGraph :: DynGraph g => TransportConfig -> Either ConfigError (g Transport String)
 configGraph ts = do
-  transports <- transportSet ts
-  nodes <- configNodes transports
-  edges <- configEdges nodes
+  nonDupeConfig <- useError DuplicateNodes $ set ts
+  let nodes = configNodes transports
+  edges <- useError TransportDoesNotExist $ buildEdges nodes
   let graph = mkGraph nodes edges
-  maybeToEither CyclicForwards $ acyclic graph
+  useError CyclicForwards $ acyclic graph
