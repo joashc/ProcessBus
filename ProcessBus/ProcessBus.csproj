@@ -35,15 +35,19 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="LanguageExt.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\LanguageExt.Core.1.7.27\lib\net45\LanguageExt.Core.dll</HintPath>
+      <HintPath>..\packages\LanguageExt.Core.1.7.29\lib\net45\LanguageExt.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="LanguageExt.Parsec, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LanguageExt.Parsec.1.7.29\lib\net45\LanguageExt.Parsec.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="LanguageExt.Process, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\LanguageExt.Process.1.7.27\lib\net45\LanguageExt.Process.dll</HintPath>
+      <HintPath>..\packages\LanguageExt.Process.1.7.29\lib\net45\LanguageExt.Process.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -72,14 +76,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PBEnv.cs" />
+    <Compile Include="Prelude\ByteString.cs" />
+    <Compile Include="Prelude\Crypto.cs" />
+    <Compile Include="Prelude\ProcessName.cs" />
+    <Compile Include="ProcessBusMessage.cs" />
+    <Compile Include="Receive.cs" />
     <Compile Include="Send.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SubscriptionBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Config\" />
+    <ProjectReference Include="..\ProcessBus.Config\ProcessBus.Config.csproj">
+      <Project>{F7B27198-96D8-49A6-99BA-F84082FDE77A}</Project>
+      <Name>ProcessBus.Config</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

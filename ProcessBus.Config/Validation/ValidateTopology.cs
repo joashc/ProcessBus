@@ -39,6 +39,5 @@ namespace ProcessBus.Config.Validation
                    in CheckCyclicity(_routingDefinitionToGraph(def)).ToEither(ConfigError.CyclicConfiguration)
                    select def;
         }
-         
     }
 }
