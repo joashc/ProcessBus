@@ -81,8 +81,8 @@
     <Compile Include="Prelude\Crypto.cs" />
     <Compile Include="Prelude\ProcessName.cs" />
     <Compile Include="ProcessBusMessage.cs" />
-    <Compile Include="Receive.cs" />
-    <Compile Include="Send.cs" />
+    <Compile Include="Subscriber.cs" />
+    <Compile Include="SendMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SubscriptionBuilder.cs" />
   </ItemGroup>

@@ -3,6 +3,7 @@ using TopologicalSort;
 using LanguageExt;
 using ProcessBus.Config.Errors;
 using static ProcessBus.Config.Validation.TopologyValidation;
+using static LanguageExt.Prelude;
 
 namespace ProcessBus.Config.Validation
 {
@@ -17,27 +18,40 @@ namespace ProcessBus.Config.Validation
         }
 
         // CheckDuplicateTransports :: RoutingDefinition -> Either ConfigError RoutingDefinition
-        public static Either<ConfigError, RoutingDefinition> CheckDuplicateTransports(RoutingDefinition def)
+        public static Either<IConfigError, RoutingDefinition> CheckDuplicateTransports(RoutingDefinition def)
         {
-            return from _ 
-                   in CheckDuplicates(def.Transports).ToEither(ConfigError.DuplicateTransports)
-                   select def;
+            var duplicateTransport =  from _ 
+                                      in CheckDuplicates(def.Transports)
+                                      select def;
+            return duplicateTransport.Match(
+                _ => Right<IConfigError, RoutingDefinition>(def),
+                transport => Left<IConfigError, RoutingDefinition>(new DuplicateTransportError(transport))
+            );
         }
 
         // CheckSelfForwards :: RoutingDefinition -> Either ConfigError RoutingDefinition
-        public static Either<ConfigError, RoutingDefinition> CheckSelfForwarding(RoutingDefinition def)
+        public static Either<IConfigError, RoutingDefinition> CheckSelfForwarding(RoutingDefinition def)
         {
-            return from _ 
-                   in CheckSelfForwards(_routingDefinitionToGraph(def)).ToEither(ConfigError.SelfForwards)
-                   select def;
+            var selfForward = from _ 
+                              in CheckSelfForwards(_routingDefinitionToGraph(def))
+                              select def;
+
+            return selfForward.Match(
+                Right<IConfigError, RoutingDefinition>,
+                transport => Left<IConfigError, RoutingDefinition>(new SelfForwardError(transport))
+            );
         }
 
         // CheckForwardingCyclicity :: RoutingDefinition -> Either ConfigError RoutingDefinition
-        public static Either<ConfigError, RoutingDefinition> CheckForwardingCyclicity(RoutingDefinition def)
+        public static Either<IConfigError, RoutingDefinition> CheckForwardingCyclicity(RoutingDefinition def)
         {
-            return from _ 
-                   in CheckCyclicity(_routingDefinitionToGraph(def)).ToEither(ConfigError.CyclicConfiguration)
-                   select def;
+            var cyclicConfig = from _ 
+                               in CheckCyclicity(_routingDefinitionToGraph(def))
+                               select def;
+            return cyclicConfig.Match(
+                _ => Right<IConfigError, RoutingDefinition>(def),
+                () => Left<IConfigError, RoutingDefinition>(new CyclicConfigurationError())
+            );
         }
     }
 }

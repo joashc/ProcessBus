@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using LanguageExt;
 using static LanguageExt.Process;
-using static ProcessBus.Receive;
+using static ProcessBus.Subscriber;
 using static LanguageExt.Prelude;
 using static ProcessBus.Prelude;
 

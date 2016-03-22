@@ -85,9 +85,10 @@
     <Compile Include="Definitions\BusDefinition.cs" />
     <Compile Include="Definitions\IMessageTransport.cs" />
     <Compile Include="Definitions\RoutingDefinition.cs" />
-    <Compile Include="Errors\ConfigErrorInfo.cs" />
-    <Compile Include="Errors\ConfigErrorMap.cs" />
-    <Compile Include="Errors\ConfigError.cs" />
+    <Compile Include="Errors\DuplicateTransportError.cs" />
+    <Compile Include="Errors\SelfForwardError.cs" />
+    <Compile Include="Errors\CyclicConfigurationError.cs" />
+    <Compile Include="Errors\IConfigError.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Validation\Graph.cs" />
     <Compile Include="Validation\TopologyValidation.cs" />
