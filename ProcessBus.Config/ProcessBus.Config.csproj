@@ -80,11 +80,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfigBuilder.cs" />
+    <Compile Include="ConfigParser.cs" />
     <Compile Include="Definitions\ForwardingDefinition.cs" />
     <Compile Include="Definitions\QueueDefinition.cs" />
     <Compile Include="Definitions\BusDefinition.cs" />
     <Compile Include="Definitions\IMessageTransport.cs" />
+    <Compile Include="Definitions\RawConfig.cs" />
     <Compile Include="Definitions\RoutingDefinition.cs" />
+    <Compile Include="Errors\ConfigurationException.cs" />
+    <Compile Include="Errors\ParseError.cs" />
+    <Compile Include="Errors\NonExistentTransportError.cs" />
     <Compile Include="Errors\DuplicateTransportError.cs" />
     <Compile Include="Errors\SelfForwardError.cs" />
     <Compile Include="Errors\CyclicConfigurationError.cs" />

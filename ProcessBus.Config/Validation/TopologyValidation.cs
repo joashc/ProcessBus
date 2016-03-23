@@ -24,7 +24,7 @@ namespace ProcessBus.Config.Validation
         // CheckSelfForwards :: (Eq a, Graph g) => g -> Either a g
         public static Either<A, Graph<A>> CheckSelfForwards<A>(Graph<A> graph) where A : IEquatable<A>
         {
-            return Optional(graph.Edges.FirstOrDefault(e => e.From.Equals(e.To)))
+            return graph.Edges.Find(e => e.From.Equals(e.To))
                 .Match(
                     selfForward => Left<A, Graph<A>>(selfForward.From),
                     () => Right<A, Graph<A>>(graph)

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ProcessBus.Config.Definitions;
 using LanguageExt;
+using ProcessBus.Config.Errors;
 using static LanguageExt.Prelude;
 using static LanguageExt.Process;
 using static ProcessBus.Prelude;
@@ -53,6 +54,12 @@ namespace ProcessBus.Router
             return router;
         }
 
+
+        public static ProcessId SpawnRouterFromConfig(Either<IConfigError, RoutingDefinition> def)
+        {
+            if (def.IsLeft) throw new ConfigurationException(def.LeftToArray()[0]);
+            return SpawnRouter(def.RightToArray()[0]);
+        }
 
     }
 }

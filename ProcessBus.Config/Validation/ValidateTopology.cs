@@ -1,4 +1,5 @@
-﻿using ProcessBus.Config.Definitions;
+﻿using System.Linq;
+using ProcessBus.Config.Definitions;
 using TopologicalSort;
 using LanguageExt;
 using ProcessBus.Config.Errors;
@@ -23,6 +24,7 @@ namespace ProcessBus.Config.Validation
             var duplicateTransport =  from _ 
                                       in CheckDuplicates(def.Transports)
                                       select def;
+
             return duplicateTransport.Match(
                 _ => Right<IConfigError, RoutingDefinition>(def),
                 transport => Left<IConfigError, RoutingDefinition>(new DuplicateTransportError(transport))
@@ -42,12 +44,29 @@ namespace ProcessBus.Config.Validation
             );
         }
 
+        public static Either<IConfigError, RawConfig> CheckForwardsExist(RawConfig config)
+        {
+            var transports = config.Transports;
+            var forwards = config.Forwards;
+            foreach (var forward in forwards)
+            {
+                var toExists = transports.Contains(forward.Item1);
+                var fromExists = transports.Contains(forward.Item2);
+                if (!toExists || !fromExists)
+                {
+                    return Left<IConfigError, RawConfig>(new NonExistentTransportError(forward, toExists, fromExists));
+                }
+            }
+            return Right<IConfigError, RawConfig>(config);
+        }
+
         // CheckForwardingCyclicity :: RoutingDefinition -> Either ConfigError RoutingDefinition
         public static Either<IConfigError, RoutingDefinition> CheckForwardingCyclicity(RoutingDefinition def)
         {
             var cyclicConfig = from _ 
                                in CheckCyclicity(_routingDefinitionToGraph(def))
                                select def;
+
             return cyclicConfig.Match(
                 _ => Right<IConfigError, RoutingDefinition>(def),
                 () => Left<IConfigError, RoutingDefinition>(new CyclicConfigurationError())
