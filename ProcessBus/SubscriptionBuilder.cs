@@ -34,7 +34,7 @@ namespace ProcessBus
             var process = spawn<ProcessBusMessage>($"handler-{Topic}-{ProcessSuffix()}", msg =>
             {
                 TryHandle(_handlerMap, msg);
-            });
+            }, ProcessFlags.PersistInbox);
             register(Topic, process);
             return process;
         }

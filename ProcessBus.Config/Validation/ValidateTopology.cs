@@ -14,7 +14,7 @@ namespace ProcessBus.Config.Validation
         private static Graph<string> _routingDefinitionToGraph(RoutingDefinition def)
         {
             var verticies = def.Transports.Select(t => t.Path);
-            var edges = def.Forwarding.Select(f => new Edge<string>(f.Bus.Path, f.ForwardTo.Path));
+            var edges = def.Forwarding.Select(f => new Edge<string>(f.ForwardFrom.Path, f.ForwardTo.Path));
             return new Graph<string>(verticies, edges);
         }
 

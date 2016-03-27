@@ -2,13 +2,13 @@
 {
     public class ForwardingDefinition
     {
-        public ForwardingDefinition(BusDefinition fromBus, IMessageTransport forwardTo)
+        public ForwardingDefinition(IMessageTransport forwardFrom, IMessageTransport forwardTo)
         {
-            Bus = fromBus;
+            ForwardFrom = forwardFrom;
             ForwardTo = forwardTo;
         }
 
-        public BusDefinition Bus { get; private set; }
+        public IMessageTransport ForwardFrom { get; private set; }
         public IMessageTransport ForwardTo { get; private set; }
     }
 }

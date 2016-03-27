@@ -1,4 +1,5 @@
-﻿using LanguageExt;
+﻿using System.Runtime.InteropServices;
+using LanguageExt;
 using Newtonsoft.Json;
 using static LanguageExt.Process;
 
@@ -10,7 +11,8 @@ namespace ProcessBus
         {
             var serialized = JsonConvert.SerializeObject(message);
             var pbm = new ProcessBusMessage(transport, message.GetType(), serialized);
-            tell("@router", pbm);
+            var leastBusyRouter = Dispatch.leastBusy(find("router"));
+            tell(leastBusyRouter, pbm);
             return Unit.Default;
         }
     }

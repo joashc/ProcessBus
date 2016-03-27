@@ -1,4 +1,7 @@
-﻿namespace ProcessBus.Config.Definitions
+﻿using System;
+using static System.String;
+
+namespace ProcessBus.Config.Definitions
 {
     public class BusDefinition : IMessageTransport
     {
@@ -23,6 +26,14 @@
         public override int GetHashCode()
         {
             return Path.GetHashCode();
+        }
+
+        public int CompareTo(object obj)
+        {
+            if (obj == null) return 1;
+            var transport = obj as IMessageTransport;
+            if (transport == null) throw new ArgumentException("Object is not an IMessageTransport");
+            return Compare(Path, transport.Path, StringComparison.Ordinal);
         }
     }
 }

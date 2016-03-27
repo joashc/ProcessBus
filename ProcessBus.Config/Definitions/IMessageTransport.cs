@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProcessBus.Config.Definitions
 {
-    public interface IMessageTransport : IEquatable<IMessageTransport>
+    public interface IMessageTransport : IEquatable<IMessageTransport>, IComparable
     {
         string Path { get; }
     }
