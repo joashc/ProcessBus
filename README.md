@@ -34,7 +34,7 @@ Transports:
 
 Let's say a user joins your site. All your backend has to do is raise an event, `UserJoined`. This configuration will have the `UserJoined` message automatically forwarded to your email endpoint, where you could handle it to send a welcome email, for example. We can decouple our services very easily if our event raisers don't have to know where the messages should be delivered.
 
-Similarly, the `PrivateMessage` is set up to automatically forward to the `WebSockets` endpoint, but if we wanted to send emails on private messages as well, we would only have to add a forward to the `Email` endpoint:
+Similarly, the `PrivateMessage` is set up to automatically forward to the `WebSockets` endpoint, but if we wanted to send emails on private messages as well, we would only have to add a forward to the `Email` endpoint, and set up our email service to handle it (see [Receiving](#receiving) section):
 
 ````Yaml
 - Path: PrivateMessage
@@ -139,7 +139,7 @@ If you're using C#6, you can just import the `SendMessage` class:
 using static ProcessBus.SendMessage;
 ```
 
-Let's say the user calls an API method to join. You can just add the following line:
+Let's say the user calls an API method to join. You can just add the following line to send a `UserJoinedMessage` to the `UserJoined` endpoint:
 
 ```C#
 public async Task<Response> Join(UserInfo userInfo) 
@@ -152,13 +152,13 @@ public async Task<Response> Join(UserInfo userInfo)
 If you're not using C#6, you'll have to call `SendMessage.Send`.
 
 ### Receiving
-Receiving messages is quite simple:
+Receiving messages is quite simple. Here's how you would implement a simple monitor for user joined messages:
 
 ```C#
 using static ProcessBus.Subscriber;
 
 Subscribe("Monitor")
-	.Handle<UserJoinedMessage(m => {
+	.Handle<UserJoinedMessage>(m => {
 		Console.WriteLine($"User {m.User.Name} joined.")
 	});
 ```
