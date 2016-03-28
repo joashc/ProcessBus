@@ -78,6 +78,10 @@
       <HintPath>..\packages\TopologicalSort.1.0.0\lib\net35\TopologicalSort.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="YamlDotNet, Version=3.8.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\YamlDotNet.3.8.0\lib\net35\YamlDotNet.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigBuilder.cs" />
@@ -87,6 +91,7 @@
     <Compile Include="Definitions\IMessageTransport.cs" />
     <Compile Include="Definitions\RawConfig.cs" />
     <Compile Include="Definitions\RoutingDefinition.cs" />
+    <Compile Include="Definitions\Serializable.cs" />
     <Compile Include="Errors\ConfigurationException.cs" />
     <Compile Include="Errors\ParseError.cs" />
     <Compile Include="Errors\NonExistentTransportError.cs" />
@@ -98,11 +103,13 @@
     <Compile Include="Validation\Graph.cs" />
     <Compile Include="Validation\TopologyValidation.cs" />
     <Compile Include="Validation\ValidateTopology.cs" />
+    <Compile Include="YamlParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

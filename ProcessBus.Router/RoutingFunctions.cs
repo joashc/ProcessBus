@@ -58,7 +58,6 @@ namespace ProcessBus.Router
                                     return 0;
                                 });
                             });
-
                         }
                     });
                 }
@@ -94,7 +93,7 @@ namespace ProcessBus.Router
 
         public static ProcessId SpawnRouterFromConfig(Either<IConfigError, RoutingDefinition> def)
         {
-            if (def.IsLeft) throw new ConfigurationException(def.LeftToArray()[0]);
+            def.IfLeft(err => { throw new ConfigurationException(err); });
             return SpawnRouter(def.RightToArray()[0]);
         }
 

@@ -1,0 +1,10 @@
+Transports:
+- Path: EventA
+  ForwardTo:
+  - EventB
+- Path: EventB
+  ForwardTo:
+  - EventC
+- Path: EventC  
+  ForwardTo:
+  - EventA
